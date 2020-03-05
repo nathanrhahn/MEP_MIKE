@@ -6,15 +6,26 @@ library(tidyverse)
 #TODO: create cause-specific map 
 #TODO: ratio of conflict events to conflict killings within each MEP HWC sector
 
-
+## Load Data
 mike <- read.csv("C:/Users/nhahn/Dropbox (Personal)/MEP_Working/Data/ER_Events/events_csv/MEP-MIKE.csv")
 
-
 # split CauseOfDeath into cause and means
-mike <- mutate(mike, temp = str_replace(event_details_CauseOfDeath, "_", "-")) 
-mike <- separate(mike,temp, c("cause", "means"), sep = "-", remove = TRUE)
+mike <- separate(mike,event_details_CauseOfDeath, c("cause", "means"), sep = "_", remove = FALSE, extra = "merge")
+mike$cause <- as.factor(mike$cause)
+mike$means <- as.factor(mike$means)
 
+## Chi Squared Test
+# Test if type of illegal killing (poached vs. conflict) is correlated with means of killing
+# filter to conflict and poaching events
+# create contingency table
+# run chi2 test
 
+tbl <- droplevels(subset(mike, cause == c("conflict", "poached")))
+tbl <- table(tbl$cause, tbl$means)
 
+(tbl)
+round(prop.table(tbl),2)
 
+chi2 <- chisq.test(tbl)
+chi2
 
