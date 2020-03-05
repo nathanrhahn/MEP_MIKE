@@ -1,0 +1,59 @@
+---
+title: "MIKE worksheet"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+
+#TODO: Trend in cause/means over time
+#TODO: create cause-specific map 
+#TODO: ratio of conflict events to conflict killings within each MEP HWC sector
+
+```{r}
+## Load Data
+mike <- read.csv("C:/Users/nhahn/Dropbox (Personal)/MEP_Working/Data/ER_Events/events_csv/MEP-MIKE.csv")
+
+# time formatting
+mike$time <- as.POSIXct(strptime(mike$time, format = '%Y-%m-%d %H:%M:%S'))
+
+# split CauseOfDeath into cause and means
+mike <- separate(mike,event_details_CauseOfDeath, c("cause", "means"), sep = "_", remove = FALSE, extra = "merge")
+mike$cause <- as.factor(mike$cause)
+mike$means <- as.factor(mike$means)
+
+```
+
+### Chi Squared Test
+Test if type of illegal killing (poached vs. conflict) is correlated with means of killing
+1. filter to conflict and poaching events
+2. create contingency table
+3. run chi2 test
+
+```{r}
+tbl <- droplevels(filter(mike, cause %in% c("conflict", "poached")))
+tbl <- table(tbl$means, tbl$cause)
+
+(tbl)
+round(prop.table(tbl),2)
+```
+
+pvalue is << 0.05. Cause and Means are highly correlated. This is likely due to the large number of spear poaching events -- 50% of all poaching events in the data set. However, means does not appear automatically associated with cause, as there are conflict deaths from gunshot and spear. 
+```{r}
+chi2 <- chisq.test(tbl)
+chi2
+```
+
+Line graph of Means by year carcass found. Seperate graphs for Cause. 
+```{r}
+df <- droplevels(filter(mike, cause %in% c("conflict", "poached"))) %>%
+  group_by(year(time)) %>%
+  
+
+
+```
+
+
