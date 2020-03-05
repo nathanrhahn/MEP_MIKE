@@ -20,12 +20,14 @@ mike$means <- as.factor(mike$means)
 # create contingency table
 # run chi2 test
 
-tbl <- droplevels(subset(mike, cause == c("conflict", "poached")))
-tbl <- table(tbl$cause, tbl$means)
+tbl <- droplevels(filter(mike, cause %in% c("conflict", "poached")))
+tbl <- table(tbl$means, tbl$cause)
 
 (tbl)
 round(prop.table(tbl),2)
 
+
+# pvalue is << 0.05. Cause and Means are correlated
 chi2 <- chisq.test(tbl)
 chi2
 
