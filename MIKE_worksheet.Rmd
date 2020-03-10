@@ -5,7 +5,11 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
+library(RColorBrewer)
 library(lubridate)
+theme_set(theme_bw() + theme(text = element_text(size=14), 
+                             panel.border = element_blank(), panel.grid.major = element_blank(),
+                             panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))) 
 ```
 
 
@@ -50,8 +54,19 @@ chi2
 Line graph of Means by year carcass found. Seperate graphs for Cause. 
 ```{r}
 df <- droplevels(filter(mike, cause %in% c("conflict", "poached"))) %>%
-  group_by(year(time)) %>%
-  
+  group_by(year(time), cause) %>%
+  tally() %>%
+  mutate(freq = n/sum(n)) %>%
+  rename(year = `year(time)`)
+ggplot(df, aes(x = as.factor(year), y = freq, group = cause, shape = cause)) + geom_point() + geom_line() +
+  labs(x = "Year", y = "Frequency (By Year)", shape = "Type of Death")
+
+df <- droplevels(filter(mike, cause %in% c("conflict", "poached"))) %>%
+  group_by(year(time), means) %>%
+  tally() %>%
+  mutate(freq = n/sum(n)) %>%
+  rename(year = `year(time)`)
+ggplot(df, aes(x = as.factor(year), y = freq, group = means, shape = means)) + geom_line() + geom_point() + scale_shape_manual(values = as.integer(unique(df$means)))
 
 
 ```
